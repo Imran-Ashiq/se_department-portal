@@ -1,0 +1,95 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                       String    @id @default(cuid())
+  email                    String    @unique
+  name                     String?
+  rollNumber               String?   @unique
+  password                 String
+  role                     Role      @default(STUDENT)
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+
+  // Relationships
+  notices                  Notice[]
+  applications             Application[]
+  remarks                  Remark[]
+
+  // For password reset
+  passwordResetToken       String?   @unique
+  passwordResetTokenExpiresAt DateTime?
+}
+
+enum Role {
+  STUDENT
+  CLERK
+  TEACHER
+  ADMIN
+  SUPER_ADMIN
+}
+
+model Notice {
+  id              String    @id @default(cuid())
+  title           String
+  content         String
+  category        Category
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  authorId        String
+  author          User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  // For attachments
+  attachmentUrl   String?
+  attachmentType  String?
+  thumbnailUrl    String?
+}
+
+enum Category {
+  GENERAL
+  EXAMS
+  EVENTS
+}
+
+model Application {
+  id              String    @id @default(cuid())
+  title           String
+  content         String
+  status          Status    @default(PENDING)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  studentId       String
+  student         User      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  // For attachments
+  attachmentUrl   String?
+
+  // Relationship
+  remarks         Remark[]
+}
+
+enum Status {
+  PENDING
+  UNDER_REVIEW
+  RESOLVED
+  REJECTED
+}
+
+model Remark {
+  id            String      @id @default(cuid())
+  content       String
+  createdAt     DateTime    @default(now())
+  authorId      String
+  author        User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+}
