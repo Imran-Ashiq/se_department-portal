@@ -88,6 +88,31 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Send push notification via OneSignal
+    try {
+      const notificationPayload = {
+        app_id: process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID,
+        headings: { en: "Department Update" },
+        contents: { en: `New Notice: ${notice.title}` },
+        included_segments: ["All"],
+        url: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}`,
+      };
+
+      await fetch('https://onesignal.com/api/v1/notifications', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Basic ${process.env.ONESIGNAL_REST_API_KEY}`,
+        },
+        body: JSON.stringify(notificationPayload),
+      });
+
+      console.log('Push notification sent successfully');
+    } catch (notifError) {
+      console.error('Failed to send push notification:', notifError);
+      // Don't fail the request if notification fails
+    }
+
     return NextResponse.json(notice, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {

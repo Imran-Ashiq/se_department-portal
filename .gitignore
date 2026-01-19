@@ -51,6 +51,9 @@ yarn-error.log*
 /public/worker-*.js.map
 *[0-9a-f]{20}.js.map
 
+# OneSignal worker should be tracked
+!/public/OneSignalSDKWorker.js
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
