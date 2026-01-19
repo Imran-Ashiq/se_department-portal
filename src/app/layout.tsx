@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
@@ -15,6 +15,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: "#0f172a",
+};
+
 export const metadata: Metadata = {
   title: "Departmental Portal - Student Management System",
   description: "A secure, centralized hub for university department to manage announcements and student applications.",
@@ -24,7 +31,6 @@ export const metadata: Metadata = {
     icon: "/logo.svg",
   },
   manifest: "/manifest.json",
-  themeColor: "#0f172a",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -39,11 +45,6 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Departmental Portal",
     description: "Centralized hub for department announcements and student applications",
-  },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
   },
 };
 
