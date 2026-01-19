@@ -23,6 +23,13 @@ export const metadata: Metadata = {
   icons: {
     icon: "/logo.svg",
   },
+  manifest: "/manifest.json",
+  themeColor: "#0f172a",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Portal",
+  },
   openGraph: {
     title: "Departmental Portal",
     description: "Centralized hub for department announcements and student applications",
@@ -32,6 +39,11 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Departmental Portal",
     description: "Centralized hub for department announcements and student applications",
+  },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
   },
 };
 
