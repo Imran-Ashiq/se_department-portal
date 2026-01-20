@@ -1,0 +1,7 @@
+[auth]
+token=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
+
+[defaults]
+url=https://sentry.io/
+org=imran-ashiq
+project=javascript-nextjs
