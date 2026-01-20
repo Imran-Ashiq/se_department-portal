@@ -25,38 +25,15 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const result = await signIn('credentials', {
+      // Let NextAuth handle the redirect automatically
+      await signIn('credentials', {
         identifier,
         password,
-        redirect: false,
+        callbackUrl: '/dashboard',
       });
-
-      if (result?.error) {
-        setError('Invalid credentials');
-        toast.error('Invalid credentials');
-      } else if (result?.ok) {
-        toast.success('Login successful');
-        
-        // Small delay to ensure session is set
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Redirect based on role
-        const session = await fetch('/api/auth/session').then(res => res.json());
-        if (session?.user?.role === 'STUDENT') {
-          router.push('/dashboard');
-          router.refresh();
-        } else if (session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN') {
-          router.push('/admin/dashboard');
-          router.refresh();
-        } else {
-          router.push('/dashboard');
-          router.refresh();
-        }
-      }
     } catch (error) {
       setError('An error occurred. Please try again.');
       toast.error('An error occurred. Please try again.');
-    } finally {
       setIsLoading(false);
     }
   };
