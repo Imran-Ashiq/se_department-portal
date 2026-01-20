@@ -36,14 +36,21 @@ export default function LoginPage() {
         toast.error('Invalid credentials');
       } else if (result?.ok) {
         toast.success('Login successful');
+        
+        // Small delay to ensure session is set
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
         // Redirect based on role
         const session = await fetch('/api/auth/session').then(res => res.json());
         if (session?.user?.role === 'STUDENT') {
           router.push('/dashboard');
+          router.refresh();
         } else if (session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN') {
           router.push('/admin/dashboard');
+          router.refresh();
         } else {
           router.push('/dashboard');
+          router.refresh();
         }
       }
     } catch (error) {
