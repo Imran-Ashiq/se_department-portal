@@ -16,6 +16,18 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
     
     if (!isProduction) {
       console.log('OneSignal: Skipped on localhost (production only)');
+      
+      // Unregister any existing OneSignal service workers
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          registrations.forEach((registration) => {
+            if (registration.active?.scriptURL.includes('OneSignal')) {
+              registration.unregister();
+              console.log('Unregistered OneSignal service worker');
+            }
+          });
+        });
+      }
       return;
     }
 
@@ -36,6 +48,8 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
           await OneSignal.init({
             appId: appId,
             allowLocalhostAsSecureOrigin: true,
+            serviceWorkerParam: { scope: '/' },
+            serviceWorkerPath: '/OneSignalSDKWorker.js',
             notifyButton: {
               enable: true,
             },
