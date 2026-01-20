@@ -8,6 +8,8 @@
   "orientation": "portrait",
   "scope": "/",
   "start_url": "/",
+  "gcm_sender_id": "482941778795",
+  "gcm_sender_id_comment": "Do not change the GCM Sender ID",
   "icons": [
     {
       "src": "/icons/icon-192.png",
