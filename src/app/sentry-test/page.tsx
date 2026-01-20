@@ -4,16 +4,18 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertCircle } from 'lucide-react';
 import * as Sentry from '@sentry/nextjs';
-import { toast } from 'sonner';
+import { useState } from 'react';
 
 export default function SentryTestPage() {
+  const [message, setMessage] = useState('');
+
   const throwError = () => {
     try {
       throw new Error("Sentry Test Error - This is a deliberate error for testing!");
     } catch (error) {
       Sentry.captureException(error);
-      toast.error('Error captured by Sentry! Check your dashboard.');
-      console.error(error);
+      setMessage('✅ Error captured by Sentry! Check your dashboard.');
+      console.error('Captured error:', error);
     }
   };
 
@@ -23,17 +25,17 @@ export default function SentryTestPage() {
       throw new Error("Sentry Async Test Error - This is a deliberate async error!");
     } catch (error) {
       Sentry.captureException(error);
-      toast.error('Async error captured by Sentry! Check your dashboard.');
-      console.error(error);
+      setMessage('✅ Async error captured by Sentry! Check your dashboard.');
+      console.error('Captured async error:', error);
     }
   };
 
   const throwUnhandledError = () => {
+    setMessage('⚠️ Unhandled error will be thrown in 1 second...');
     // This will actually crash and be caught by Sentry's error boundary
     setTimeout(() => {
-      throw new Error("Unhandled Error - This will crash the app!");
-    }, 100);
-    toast.info('Unhandled error thrown - check console and Sentry in 2 seconds!');
+      throw new Error("Unhandled Error - This will crash and be auto-captured by Sentry!");
+    }, 1000);
   };
 
   return (
@@ -49,6 +51,12 @@ export default function SentryTestPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {message && (
+            <div className="p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-md text-sm">
+              {message}
+            </div>
+          )}
+
           <div className="space-y-2">
             <h3 className="text-sm font-semibold">Captured Sync Error</h3>
             <p className="text-xs text-muted-foreground">Manually captured and sent to Sentry</p>
@@ -56,6 +64,7 @@ export default function SentryTestPage() {
               onClick={throwError}
               variant="destructive"
               className="w-full"
+              type="button"
             >
               Throw Captured Sync Error
             </Button>
@@ -68,6 +77,7 @@ export default function SentryTestPage() {
               onClick={throwAsyncError}
               variant="destructive"
               className="w-full"
+              type="button"
             >
               Throw Captured Async Error
             </Button>
@@ -80,6 +90,7 @@ export default function SentryTestPage() {
               onClick={throwUnhandledError}
               variant="destructive"
               className="w-full"
+              type="button"
             >
               Throw Unhandled Error
             </Button>
@@ -88,6 +99,7 @@ export default function SentryTestPage() {
           <div className="text-xs text-muted-foreground mt-4 p-3 bg-muted rounded-md">
             <p className="font-semibold mb-1">Note:</p>
             <p>All errors are sent to Sentry. Check your dashboard to see captured errors with full stack traces and context.</p>
+            <p className="mt-2">Open browser console (F12) to see error logs.</p>
           </div>
         </CardContent>
       </Card>
