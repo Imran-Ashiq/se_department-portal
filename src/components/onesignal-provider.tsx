@@ -11,6 +11,14 @@ declare global {
 
 export function OneSignalProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
+    // Only initialize OneSignal on production
+    const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+    
+    if (!isProduction) {
+      console.log('OneSignal: Skipped on localhost (production only)');
+      return;
+    }
+
     // Load OneSignal script
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     
@@ -22,8 +30,11 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
     script.onload = () => {
       window.OneSignalDeferred.push(async function(OneSignal: any) {
         try {
+          const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
+          console.log('Initializing OneSignal with App ID:', appId);
+          
           await OneSignal.init({
-            appId: process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID,
+            appId: appId,
             allowLocalhostAsSecureOrigin: true,
             notifyButton: {
               enable: true,
