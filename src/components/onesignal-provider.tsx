@@ -48,8 +48,6 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
           await OneSignal.init({
             appId: appId,
             allowLocalhostAsSecureOrigin: true,
-            serviceWorkerParam: { scope: '/' },
-            serviceWorkerPath: '/OneSignalSDKWorker.js',
             notifyButton: {
               enable: true,
             },
