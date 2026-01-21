@@ -77,10 +77,10 @@ export default function AdminNoticesPage() {
   const fetchNotices = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/notices');
+      const response = await fetch('/api/notices?limit=100');
       if (!response.ok) throw new Error('Failed to fetch notices');
       const data = await response.json();
-      setNotices(data);
+      setNotices(data.notices || []);
     } catch (error) {
       toast.error('Failed to load notices');
       console.error('Error fetching notices:', error);
