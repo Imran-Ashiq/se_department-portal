@@ -29,7 +29,11 @@ interface NoticeFeedProps {
 }
 
 export function NoticeFeed({ initialNotices, initialHasMore }: NoticeFeedProps) {
-  const [notices, setNotices] = useState<Notice[]>(initialNotices);
+  // Debug logging
+  console.log('NoticeFeed initialNotices:', initialNotices);
+  console.log('Is array?', Array.isArray(initialNotices));
+  
+  const [notices, setNotices] = useState<Notice[]>(initialNotices || []);
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -48,6 +52,12 @@ export function NoticeFeed({ initialNotices, initialHasMore }: NoticeFeedProps) 
 
       const data = await response.json();
       
+      // Ensure we have an array of notices
+      if (!data.notices || !Array.isArray(data.notices)) {
+        console.error('Invalid data format:', data);
+        return;
+      }
+      
       // Serialize dates
       const serializedNotices = data.notices.map((notice: any) => ({
         ...notice,
@@ -63,6 +73,18 @@ export function NoticeFeed({ initialNotices, initialHasMore }: NoticeFeedProps) 
       setLoading(false);
     }
   };
+
+  // Safety check - ensure notices is an array
+  if (!Array.isArray(notices)) {
+    console.error('Notices is not an array:', notices);
+    return (
+      <Card className="border-2 border-dashed">
+        <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+          <p className="text-red-600">Error loading notices. Please refresh the page.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (notices.length === 0) {
     return (
