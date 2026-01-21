@@ -107,12 +107,15 @@ export function NoticeFeed({ initialNotices, initialHasMore }: NoticeFeedProps) 
   return (
     <>
       <div className="space-y-4">
-        {notices.map((notice) => (
-          <NoticeCard
-            key={notice.id}
-            notice={notice}
-          />
-        ))}
+        {notices.map((notice) => {
+          console.log('Rendering notice:', notice.id, notice);
+          return (
+            <NoticeCard
+              key={notice.id}
+              notice={notice}
+            />
+          );
+        })}
       </div>
 
       {/* Load More Section */}

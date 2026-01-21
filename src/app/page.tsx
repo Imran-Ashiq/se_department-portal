@@ -34,14 +34,19 @@ async function getInitialNotices() {
     content: notice.content,
     category: notice.category,
     createdAt: notice.createdAt.toISOString(),
-    attachmentUrl: notice.attachmentUrl,
-    attachmentType: notice.attachmentType,
-    thumbnailUrl: notice.thumbnailUrl,
-    author: {
+    attachmentUrl: notice.attachmentUrl ?? null,
+    attachmentType: notice.attachmentType ?? null,
+    thumbnailUrl: notice.thumbnailUrl ?? null,
+    author: notice.author ? {
       id: notice.author.id,
-      name: notice.author.name,
-      email: notice.author.email,
+      name: notice.author.name ?? null,
+      email: notice.author.email ?? null,
       role: notice.author.role,
+    } : {
+      id: 'unknown',
+      name: null,
+      email: null,
+      role: 'UNKNOWN',
     },
   }));
 
