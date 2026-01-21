@@ -7,13 +7,26 @@ import { ratelimit, authRatelimit } from '@/lib/ratelimit';
 async function rateLimitMiddleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
 
-  // Apply rate limiting to API routes
-  if (path.startsWith('/api')) {
+  // Skip rate limiting for:
+  // 1. NextAuth internal routes (session, signin, signout, callback, etc.)
+  // 2. Public API routes that need high availability
+  const skipRateLimit = 
+    path.startsWith('/api/auth/session') ||
+    path.startsWith('/api/auth/signin') ||
+    path.startsWith('/api/auth/signout') ||
+    path.startsWith('/api/auth/callback') ||
+    path.startsWith('/api/auth/csrf') ||
+    path.startsWith('/api/auth/providers');
+
+  // Apply rate limiting only to custom API routes
+  if (path.startsWith('/api') && !skipRateLimit) {
     // Get IP address from headers or connection
     const ip = req.ip ?? req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip') ?? 'anonymous';
     
-    // Use stricter rate limit for auth endpoints
-    const limiter = path.startsWith('/api/auth') ? authRatelimit : ratelimit;
+    // Use stricter rate limit for custom auth endpoints (login, register, forgot-password)
+    const limiter = (path.includes('login') || path.includes('register') || path.includes('reset-password')) 
+      ? authRatelimit 
+      : ratelimit;
     
     try {
       const { success, limit, reset, remaining } = await limiter.limit(ip);
@@ -45,8 +58,8 @@ async function rateLimitMiddleware(req: NextRequest) {
       
       return response;
     } catch (error) {
-      // If rate limiting fails (e.g., Redis is down), allow the request but log the error
-      console.error('Rate limiting error:', error);
+      // If rate limiting fails (e.g., Redis is not configured), allow the request
+      console.warn('Rate limiting disabled - Redis not configured:', error);
       return NextResponse.next();
     }
   }
