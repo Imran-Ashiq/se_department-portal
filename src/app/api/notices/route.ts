@@ -16,36 +16,59 @@ const noticeSchema = z.object({
 
 const updateNoticeSchema = noticeSchema.partial();
 
-// GET /api/notices - Fetch all notices (accessible by all authenticated users)
+// GET /api/notices - Fetch notices with pagination
 export async function GET(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const { searchParams } = new URL(req.url);
     const category = searchParams.get('category');
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '5');
+    const isPublic = searchParams.get('public') === 'true';
+
+    // Calculate pagination
+    const skip = (page - 1) * limit;
 
     const where = category ? { category: category as 'GENERAL' | 'EXAMS' | 'EVENTS' } : {};
 
-    const notices = await db.notice.findMany({
-      where,
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            role: true,
+    // For non-public requests, require authentication
+    if (!isPublic) {
+      const session = await getServerSession(authOptions);
+      if (!session?.user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+    }
+
+    // Fetch notices with pagination
+    const [notices, totalCount] = await Promise.all([
+      db.notice.findMany({
+        where,
+        include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              role: true,
+            },
           },
         },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      db.notice.count({ where }),
+    ]);
 
-    return NextResponse.json(notices);
+    // Calculate if there are more notices
+    const hasMore = skip + notices.length < totalCount;
+
+    return NextResponse.json({
+      notices,
+      hasMore,
+      total: totalCount,
+      page,
+      limit,
+    });
   } catch (error) {
     console.error('Error fetching notices:', error);
     return NextResponse.json(

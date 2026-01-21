@@ -20,7 +20,7 @@ interface NoticeCardProps {
     author?: {
       id: string;
       name: string | null;
-      email: string;
+      email: string | null;
       role: string;
     } | null;
   };

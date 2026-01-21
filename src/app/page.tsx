@@ -3,31 +3,42 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Bell, LogIn, LayoutDashboard } from 'lucide-react';
-import { NoticeCard } from '@/components/notice-card';
+import { NoticeFeed } from '@/components/notice-feed';
 
-async function getNotices() {
-  const notices = await db.notice.findMany({
-    orderBy: { createdAt: 'desc' },
-    include: {
-      author: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
+async function getInitialNotices() {
+  const limit = 5;
+  
+  const [notices, totalCount] = await Promise.all([
+    db.notice.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
         },
       },
-    },
-    take: 20, // Limit to latest 20 notices
-  });
-  return notices;
+      take: limit,
+    }),
+    db.notice.count(),
+  ]);
+
+  return {
+    notices: notices.map(notice => ({
+      ...notice,
+      createdAt: notice.createdAt.toISOString(),
+    })),
+    hasMore: notices.length < totalCount,
+  };
 }
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
-  const notices = await getNotices();
+  const { notices, hasMore } = await getInitialNotices();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
@@ -79,40 +90,7 @@ export default async function Home() {
         </div>
 
         {/* Notices Feed */}
-        <div className="space-y-4">
-          {notices.length === 0 ? (
-            /* Empty State */
-            <Card className="border-2 border-dashed">
-              <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
-                  <Bell className="w-8 h-8 text-slate-400" />
-                </div>
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
-                  No Updates Yet
-                </h3>
-                <p className="text-slate-600 dark:text-slate-400 max-w-md">
-                  There are no department notices at the moment. Check back later for updates and announcements.
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            notices.map((notice) => (
-              <NoticeCard
-                key={notice.id}
-                notice={notice}
-              />
-            ))
-          )}
-        </div>
-
-        {/* Footer */}
-        {notices.length > 0 && (
-          <div className="mt-8 text-center">
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              Showing {notices.length} latest {notices.length === 1 ? 'notice' : 'notices'}
-            </p>
-          </div>
-        )}
+        <NoticeFeed initialNotices={notices} initialHasMore={hasMore} />
       </main>
 
       {/* Bottom Padding */}
@@ -120,4 +98,3 @@ export default async function Home() {
     </div>
   );
 }
-

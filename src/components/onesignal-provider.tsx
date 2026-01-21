@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 
 declare global {
   interface Window {
-    OneSignalDeferred?: Promise<any>;
+    OneSignalDeferred?: Array<(OneSignal: any) => void>;
     OneSignal?: any;
   }
 }
@@ -40,7 +40,8 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
     document.head.appendChild(script);
 
     script.onload = () => {
-      window.OneSignalDeferred.push(async function(OneSignal: any) {
+      if (window.OneSignalDeferred) {
+        window.OneSignalDeferred.push(async function(OneSignal: any) {
         try {
           const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
           console.log('Initializing OneSignal with App ID:', appId);
@@ -61,6 +62,7 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
           console.error('OneSignal initialization error:', error);
         }
       });
+      }
     };
 
     return () => {
