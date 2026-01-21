@@ -10,7 +10,7 @@ const navItems = [
   { href: '/dashboard', label: 'Home', icon: Home },
   { href: '/applications', label: 'Apps', icon: FileText },
   { href: '/applications/create', label: 'Create', icon: PlusCircle },
-  { href: '/dashboard/profile', label: 'Profile', icon: User },
+  { href: '/profile', label: 'Profile', icon: User },
 ];
 
 export function BottomNav() {
