@@ -1,13 +1,13 @@
 {
-  "name": "Departmental Portal",
-  "short_name": "Portal",
-  "description": "Department Management Portal for IUB Software Engineering",
-  "theme_color": "#0f172a",
-  "background_color": "#ffffff",
+  "name": "Departmental Portal - IUB SE",
+  "short_name": "SE Portal",
+  "description": "Department Management Portal for IUB Software Engineering - Notices & Applications",
+  "theme_color": "#4f46e5",
+  "background_color": "#f8fafc",
   "display": "standalone",
   "orientation": "portrait",
   "scope": "/",
-  "start_url": "/",
+  "start_url": "/dashboard",
   "gcm_sender_id": "482941778795",
   "gcm_sender_id_comment": "Do not change the GCM Sender ID",
   "icons": [
@@ -15,13 +15,27 @@
       "src": "/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
-  ]
+  ],
+  "categories": ["education", "productivity"],
+  "screenshots": []
 }
