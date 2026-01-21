@@ -56,11 +56,11 @@ export default function StudentDashboard() {
   const fetchNotices = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/notices');
+      const response = await fetch('/api/notices?limit=100');
       if (!response.ok) throw new Error('Failed to fetch notices');
       const data = await response.json();
-      setNotices(data);
-      setFilteredNotices(data);
+      setNotices(data.notices || []);
+      setFilteredNotices(data.notices || []);
     } catch (error) {
       toast.error('Failed to load notices');
       console.error('Error fetching notices:', error);
