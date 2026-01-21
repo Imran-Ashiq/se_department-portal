@@ -27,11 +27,26 @@ async function getInitialNotices() {
     db.notice.count(),
   ]);
 
+  // Serialize for client component
+  const serializedNotices = notices.map(notice => ({
+    id: notice.id,
+    title: notice.title,
+    content: notice.content,
+    category: notice.category,
+    createdAt: notice.createdAt.toISOString(),
+    attachmentUrl: notice.attachmentUrl,
+    attachmentType: notice.attachmentType,
+    thumbnailUrl: notice.thumbnailUrl,
+    author: {
+      id: notice.author.id,
+      name: notice.author.name,
+      email: notice.author.email,
+      role: notice.author.role,
+    },
+  }));
+
   return {
-    notices: notices.map(notice => ({
-      ...notice,
-      createdAt: notice.createdAt.toISOString(),
-    })),
+    notices: serializedNotices,
     hasMore: notices.length < totalCount,
   };
 }
