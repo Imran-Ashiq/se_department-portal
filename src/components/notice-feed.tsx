@@ -29,10 +29,6 @@ interface NoticeFeedProps {
 }
 
 export function NoticeFeed({ initialNotices, initialHasMore }: NoticeFeedProps) {
-  // Debug logging
-  console.log('NoticeFeed initialNotices:', initialNotices);
-  console.log('Is array?', Array.isArray(initialNotices));
-  
   const [notices, setNotices] = useState<Notice[]>(initialNotices || []);
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [page, setPage] = useState(1);
@@ -107,15 +103,12 @@ export function NoticeFeed({ initialNotices, initialHasMore }: NoticeFeedProps) 
   return (
     <>
       <div className="space-y-4">
-        {notices.map((notice) => {
-          console.log('Rendering notice:', notice.id, notice);
-          return (
-            <NoticeCard
-              key={notice.id}
-              notice={notice}
-            />
-          );
-        })}
+        {notices.map((notice) => (
+          <NoticeCard
+            key={notice.id}
+            notice={notice}
+          />
+        ))}
       </div>
 
       {/* Load More Section */}

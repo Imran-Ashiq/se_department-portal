@@ -49,15 +49,14 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
           await OneSignal.init({
             appId: appId,
             allowLocalhostAsSecureOrigin: true,
-            notifyButton: {
-              enable: true,
-            },
           });
 
           console.log('OneSignal initialized successfully');
           
-          // Show native prompt
-          OneSignal.Slidedown.promptPush();
+          // Show native prompt after initialization
+          setTimeout(() => {
+            OneSignal.Slidedown.promptPush();
+          }, 1000);
         } catch (error) {
           console.error('OneSignal initialization error:', error);
         }
